@@ -47,7 +47,7 @@ jobs:
             ${{ inputs.extra_tags }}
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3.3.0
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Get akmods signing key
         if: github.event_name != 'pull_request'
