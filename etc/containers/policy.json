@@ -1,0 +1,13 @@
+{
+  "transports": {
+    "docker": {
+      "ghcr.io/getchoo/getchblue": [
+        {
+          "type": "sigstoreSigned",
+          "keyPath": "/etc/pki/containers/getchblue.pub",
+          "signedIdentity": {"type": "matchRepository"}
+        }
+      ]
+    }
+  }
+}
