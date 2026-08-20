@@ -4,33 +4,20 @@ ARG BUILD_IMAGE="quay.io/fedora-ostree-desktops/base-atomic"
 ARG FEDORA_VERSION="${FEDORA_VERSION:-44}"
 
 FROM scratch AS ctx
-COPY helpers.sh /
+COPY scripts/ /
 
 FROM ${BUILD_IMAGE}:${FEDORA_VERSION} AS builder
 ARG FEDORA_VERSION
 
+COPY etc/pki/akmods/certs/public_key.der /etc/pki/akmods/certs/public_key.der
+
 RUN \
-        --mount=type=bind,from=ctx,src=/,destination=/ctx \
+	--mount=type=secret,id=AKMOD_KEY,mode=0444 \
+	--mount=type=bind,from=ctx,src=/,destination=/ctx \
 	--mount=type=cache,target=/var/cache \
 	--mount=type=cache,target=/var/log \
 	--mount=type=tmpfs,target=/tmp \
-	<<EOF
-source /ctx/helpers.sh
-
-setup-rpmfusion
-# FIXME: Hide our ostree-ness from kmodtool so scriptlets don't fail
-# https://bugzilla.redhat.com/show_bug.cgi?id=2459819
-sed -i "/^OSTREE_VERSION='/d" /etc/os-release
-dnf-minimal-install akmod-nvidia
-
-kernel_version="$(cd /usr/lib/modules && echo *)"
-if ! akmods --force --kernels "$kernel_version" --kmod nvidia; then
-	cat /var/cache/akmods/nvidia/*"$kernel_version".failed.log && exit 1
-fi
-
-mkdir -p /rpms
-cp /var/cache/akmods/nvidia/*.rpm /rpms
-EOF
+	/ctx/build-nvidia-kmod.sh
 
 FROM ${BASE_IMAGE}:${FEDORA_VERSION}
 ARG FEDORA_VERSION
@@ -48,6 +35,7 @@ RUN \
 source /ctx/helpers.sh
 
 # Setup external repos
+flatpak remote-add --system --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 setup-rpmfusion
 dnf install "dnf5-command(config-manager)" "dnf5-command(copr)"
 add-repofiles \
@@ -74,7 +62,6 @@ mkdir -p /var/opt
 dnf install 1password{,-cli} brave-origin fish ghostty helium nix tailscale
 
 # FIXME: Why is `system-repo.lock` left here???
-dnf clean all
 rm -rf /var/lib/dnf /run/dnf
 EOF
 
