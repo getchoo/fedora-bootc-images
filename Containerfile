@@ -15,6 +15,7 @@ RUN \
 	--mount=type=secret,id=AKMOD_KEY,mode=0444 \
 	--mount=type=bind,from=ctx,src=/,destination=/ctx,ro \
 	--mount=type=cache,target=/var/cache/libdnf5 \
+	--mount=type=tmpfs,target=/var/log \
 	--mount=type=tmpfs,target=/tmp \
 	/ctx/build-nvidia-kmod.sh
 
@@ -27,6 +28,7 @@ RUN \
 	--mount=type=bind,from=ctx,src=/,destination=/ctx \
 	--mount=type=bind,from=builder,src=/rpms,destination=/rpms \
 	--mount=type=cache,target=/var/cache/libdnf5 \
+	--mount=type=tmpfs,target=/var/log \
 	--mount=type=tmpfs,target=/tmp \
 	<<RUNEOF
 source /ctx/helpers.sh
