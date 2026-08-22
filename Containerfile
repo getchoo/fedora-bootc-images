@@ -51,9 +51,7 @@ add-coprs \
 # Setup hardware enablement (codecs, drivers, firmware, etc.)
 dnf config-manager setopt fedora-cisco-openh264.enabled=1
 dnf swap --allowerasing ffmpeg-free ffmpeg
-dnf-minimal-install --exclude=PackageKit-gstreamer-plugin \
-  install @multimedia intel-media-driver mesa-va-drivers-freeworld
-dnf --repo=rpmfusion-nonfree-tainted install "*-firmware"
+dnf-minimal-install --exclude=PackageKit-gstreamer-plugin install @multimedia
 
 # Install NVIDIA drivers
 add-repofiles /ctx/nvidia-container-toolkit.repo
