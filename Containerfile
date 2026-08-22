@@ -1,6 +1,6 @@
 ARG IMAGE_FLAVOR="${IMAGE_FLAVOR:-silverblue}"
 ARG BASE_IMAGE="quay.io/fedora-ostree-desktops/${IMAGE_FLAVOR}"
-ARG BUILD_IMAGE="quay.io/fedora-ostree-desktops/base-atomic"
+ARG BUILD_IMAGE="quay.io/fedora/fedora"
 ARG FEDORA_VERSION="${FEDORA_VERSION:-44}"
 
 FROM scratch AS ctx
