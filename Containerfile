@@ -57,7 +57,7 @@ dnf --repo=rpmfusion-nonfree-tainted install "*-firmware"
 
 # Install NVIDIA drivers
 add-repofiles /ctx/nvidia-container-toolkit.repo
-dnf install /rpms/*.rpm nvidia-container-toolkit xorg-x11-drv-nvidia-cuda
+dnf install /rpms/*.rpm libva-nvidia-driver nvidia-container-toolkit xorg-x11-drv-nvidia-cuda
 cat > /usr/lib/bootc/kargs.d/00-nvidia.toml <<EOF
 kargs = [
 	"rd.driver.blacklist=nouveau,nova_core",
