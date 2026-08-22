@@ -1,5 +1,0 @@
-kargs = [
-	"modules.sig_enforce=0",
-	"rd.driver.blacklist=nouveau,nova_core",
-	"modprobe.blacklist=nouveau,nova_core"
-]
