@@ -1,6 +1,6 @@
 ARG IMAGE_FLAVOR=silverblue
 ARG BASE_IMAGE=quay.io/fedora-ostree-desktops/${IMAGE_FLAVOR}
-ARG BUILD_IMAGE=quay.io/fedora/fedora
+ARG BUILD_IMAGE=quay.io/fedora/fedora-bootc
 ARG FEDORA_VERSION=44
 
 FROM scratch AS ctx
@@ -15,6 +15,7 @@ RUN \
 	--mount=type=secret,id=AKMOD_KEY,mode=0444 \
 	--mount=type=bind,from=ctx,src=/,destination=/ctx,ro \
 	--mount=type=cache,target=/var/cache/libdnf5 \
+	--mount=type=tmpfs,target=/var/log \
 	--mount=type=tmpfs,target=/tmp \
 	/ctx/build-nvidia-kmod.sh
 
@@ -27,6 +28,7 @@ RUN \
 	--mount=type=bind,from=ctx,src=/,destination=/ctx \
 	--mount=type=bind,from=builder,src=/rpms,destination=/rpms \
 	--mount=type=cache,target=/var/cache/libdnf5 \
+	--mount=type=tmpfs,target=/var/log \
 	--mount=type=tmpfs,target=/tmp \
 	<<RUNEOF
 source /ctx/helpers.sh
@@ -49,13 +51,11 @@ add-coprs \
 # Setup hardware enablement (codecs, drivers, firmware, etc.)
 dnf config-manager setopt fedora-cisco-openh264.enabled=1
 dnf swap --allowerasing ffmpeg-free ffmpeg
-dnf-minimal-install --exclude=PackageKit-gstreamer-plugin \
-  install @multimedia intel-media-driver mesa-va-drivers-freeworld
-dnf --repo=rpmfusion-nonfree-tainted install "*-firmware"
+dnf-minimal-install --exclude=PackageKit-gstreamer-plugin install @multimedia
 
 # Install NVIDIA drivers
 add-repofiles /ctx/nvidia-container-toolkit.repo
-dnf install /rpms/*.rpm nvidia-container-toolkit xorg-x11-drv-nvidia-cuda
+dnf install /rpms/*.rpm libva-nvidia-driver nvidia-container-toolkit xorg-x11-drv-nvidia-cuda
 cat > /usr/lib/bootc/kargs.d/00-nvidia.toml <<EOF
 kargs = [
 	"rd.driver.blacklist=nouveau,nova_core",
