@@ -67,6 +67,9 @@ EOF
 ## HACK: /opt is a dangling symlink by default so RPMs with files there
 ## fail to extract correctly
 mkdir -p /var/opt
+## HACK: / is ro with composefs. Make /nix a symlink to a writable dir
+mkdir -p /var/nix
+ln -s var/nix /nix
 dnf install 1password{,-cli} ghostty helium nix tailscale
 
 # FIXME: Why is `system-repo.lock` left here???
