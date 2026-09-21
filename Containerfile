@@ -67,7 +67,15 @@ EOF
 ## HACK: /opt is a dangling symlink by default so RPMs with files there
 ## fail to extract correctly
 mkdir -p /var/opt
-dnf install 1password{,-cli} ghostty helium nix tailscale
+dnf install 1password{,-cli} ghostty helium tailscale
+
+## HACK: / is ro with composefs. Move /nix to /var/nix where it's bind-mounted back at runtime
+curl -fsSL https://install.lix.systems/lix | \
+	sh -s -- \
+	install linux \
+	--no-confirm --no-start-daemon \
+	--enable-flakes --extra-conf 'use-xdg-base-directories = true'
+mv /nix /var/nix
 
 # FIXME: Why is `system-repo.lock` left here???
 rm -rf /var/lib/dnf /run/dnf
